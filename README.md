@@ -1,26 +1,10 @@
-# TimeReport Pro – Flutter v0.1
+# TimeReport Pro – Flutter v0.2
 
-First Flutter foundation for TimeReport Pro.
+New in v0.2:
+- Riverpod app state
+- Companies, customers, projects CRUD foundation
+- Time reports saved during app session
+- Mileage logs saved during app session
+- Dashboard with real session statistics
 
-## Includes
-- Material Design 3
-- Light and dark theme
-- GoRouter navigation
-- Riverpod ready
-- Multi-language foundation: Swedish, English, Albanian, Greek
-- Dashboard
-- Time report page
-- Mileage page
-- Companies, Projects, Customers and Settings placeholders
-
-## Run
-```bash
-flutter pub get
-flutter run
-```
-
-## Next sprint
-- SQLite/Drift database
-- Real CRUD
-- PDF export
-- GPS and camera modules
+Next: Drift/SQLite persistent database.

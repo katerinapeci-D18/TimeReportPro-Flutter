@@ -1,69 +1,16 @@
 import 'package:flutter/material.dart';
-import '../../../core/localization/app_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/state/app_state_notifier.dart';
 import '../../../shared/widgets/app_shell.dart';
 
-class TimeReportPage extends StatefulWidget {
-  const TimeReportPage({super.key});
-  @override
-  State<TimeReportPage> createState() => _TimeReportPageState();
-}
-
-class _TimeReportPageState extends State<TimeReportPage> {
-  final _formKey = GlobalKey<FormState>();
-  final _hoursController = TextEditingController();
-  final _commentController = TextEditingController();
-  DateTime _date = DateTime.now();
-
-  @override
-  void dispose() {
-    _hoursController.dispose();
-    _commentController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return AppShell(
-      title: l10n.t('time_report'),
-      child: Form(
-        key: _formKey,
-        child: ListView(padding: const EdgeInsets.all(16), children: [
-          Text(l10n.t('new_report'), style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w800)),
-          const SizedBox(height: 16),
-          ListTile(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            tileColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-            leading: const Icon(Icons.calendar_today),
-            title: Text('${_date.year}-${_date.month.toString().padLeft(2, '0')}-${_date.day.toString().padLeft(2, '0')}'),
-            trailing: const Icon(Icons.edit_calendar),
-            onTap: () async {
-              final selected = await showDatePicker(context: context, firstDate: DateTime(2020), lastDate: DateTime(2100), initialDate: _date);
-              if (selected != null) setState(() => _date = selected);
-            },
-          ),
-          const SizedBox(height: 12),
-          TextFormField(
-            controller: _hoursController,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(labelText: l10n.t('hours')),
-            validator: (value) {
-              final hours = double.tryParse(value ?? '');
-              if (hours == null || hours <= 0) return l10n.t('invalid_hours');
-              return null;
-            },
-          ),
-          const SizedBox(height: 12),
-          TextFormField(controller: _commentController, maxLines: 4, decoration: InputDecoration(labelText: l10n.t('comment'))),
-          const SizedBox(height: 20),
-          FilledButton.icon(onPressed: _save, icon: const Icon(Icons.save), label: Text(l10n.t('save'))),
-        ]),
-      ),
-    );
-  }
-
-  void _save() {
-    if (!_formKey.currentState!.validate()) return;
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Report saved locally soon. Database comes in v0.2.')));
-  }
+class TimeReportPage extends ConsumerStatefulWidget { const TimeReportPage({super.key}); @override ConsumerState<TimeReportPage> createState() => _TimeReportPageState(); }
+class _TimeReportPageState extends ConsumerState<TimeReportPage> { final hours = TextEditingController(); final km = TextEditingController(); final parking = TextEditingController(); final comment = TextEditingController();
+  @override Widget build(BuildContext context) { final s = ref.watch(appStateProvider); return AppShell(title: 'Time Report', child: ListView(padding: const EdgeInsets.all(16), children: [
+    TextField(controller: hours, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Hours')), const SizedBox(height: 12),
+    TextField(controller: km, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Kilometers')), const SizedBox(height: 12),
+    TextField(controller: parking, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Parking')), const SizedBox(height: 12),
+    TextField(controller: comment, decoration: const InputDecoration(labelText: 'Comment')), const SizedBox(height: 16),
+    FilledButton(onPressed: () { ref.read(appStateProvider.notifier).addReport(hours: double.tryParse(hours.text) ?? 0, kilometers: double.tryParse(km.text) ?? 0, parking: double.tryParse(parking.text) ?? 0, comment: comment.text); hours.clear(); km.clear(); parking.clear(); comment.clear(); }, child: const Text('Save')),
+    const SizedBox(height: 20), ...s.reports.reversed.map((r) => Card(child: ListTile(title: Text('${r.hours} h'), subtitle: Text(r.comment ?? ''), trailing: Text('${r.costs} SEK')))),
+  ])); }
 }

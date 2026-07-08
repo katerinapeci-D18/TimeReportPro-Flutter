@@ -1,0 +1,5 @@
+class Company { const Company({required this.id, required this.name}); final String id; final String name; }
+class Customer { const Customer({required this.id, required this.name}); final String id; final String name; }
+class Project { const Project({required this.id, required this.name, this.number}); final String id; final String name; final String? number; }
+class TimeReport { const TimeReport({required this.id, required this.date, required this.hours, this.comment, this.kilometers = 0, this.parking = 0, this.toll = 0, this.material = 0}); final String id; final DateTime date; final double hours; final String? comment; final double kilometers; final double parking; final double toll; final double material; double get costs => parking + toll + material; }
+class MileageLog { const MileageLog({required this.id, required this.from, required this.to, required this.kilometers, this.ratePerKm = 0}); final String id; final String from; final String to; final double kilometers; final double ratePerKm; double get amount => kilometers * ratePerKm; }
